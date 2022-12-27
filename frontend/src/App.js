@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
 import Web3Modal from 'web3modal';
-import { providers, Contract } from 'ethers';
-import { WHITELIST_CONTRACT_ADDRESS, abi, tld } from './constants';
+import { providers, Contract, ethers } from 'ethers';
+import { CONTRACT_ADDRESS, abi, tld } from './constants';
 
 // Constants
 const TWITTER_HANDLE = 'namn_grg';
@@ -112,7 +112,55 @@ const App = () => {
             </button> */}
         </div>
     );
+    const mintDomain = async () => {
+        // Don't run if the domain is empty
+        if (!domain) {
+            return;
+        }
+        // Alert the user if the domain is too short
+        if (domain.length < 3) {
+            alert('Domain must be at least 3 characters long');
+            return;
+        }
+        const price =
+            domain.length === 3 ? '0.5' : domain.length === 4 ? '0.3' : '0.1';
+        console.log('Minting domain', domain, 'with price', price);
 
+        try {
+            // We need a Signer here since this is a 'write' transaction.
+            const signer = await getProviderOrSigner(true);
+            // Create a new instance of the Contract with a Signer, which allows
+            // update methods
+            const domainContract = new Contract(CONTRACT_ADDRESS, abi, signer);
+
+            console.log('Going to mint...' + domain);
+            console.log(domainContract.address);
+
+            const tx = await domainContract.register(domain, {
+                value: ethers.utils.parseEther(price),
+            });
+            setLoading(true);
+            // wait for the transaction to get mined
+            await tx.wait();
+
+            console.log(
+                'Domain minted! https://mumbai.polygonscan.com/tx/' + tx.hash
+            );
+
+            // Set the record for the domain
+            tx = await domainContract.setData(domain, record);
+            await tx.wait();
+            console.log(
+                'Data set! https://mumbai.polygonscan.com/tx/' + tx.hash
+            );
+
+            setRecord('');
+            setDomain('');
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+        }
+    };
     const renderInputForm = () => {
         return (
             <div className="form-container">
@@ -137,16 +185,9 @@ const App = () => {
                     <button
                         className="cta-button mint-button"
                         disabled={null}
-                        onClick={null}
+                        onClick={mintDomain}
                     >
                         Mint
-                    </button>
-                    <button
-                        className="cta-button mint-button"
-                        disabled={null}
-                        onClick={null}
-                    >
-                        Set data
                     </button>
                 </div>
             </div>
