@@ -50,7 +50,7 @@ const App = () => {
             if (loading) {
                 return <button className="button">Loading...</button>;
             } else {
-                return <button className="button">Join the Whitelist</button>;
+                return <button className="button">Wallet is Connected</button>;
             }
         } else if (!walletConnected) {
             return (

@@ -9,27 +9,24 @@ async function main() {
 
     console.log('Deployed to: ', domainContract.address);
 
-    let txn = await domainContract.register('nether', {
+    let txn = await domainContract.register('Arjun', {
         value: hre.ethers.utils.parseEther('0.1'),
     });
 
     await txn.wait();
-    console.log('Minted nether.mind');
+    console.log('Minted domain Arjun.mind');
 
-    txn = await domainContract.setData(
-        'nether',
-        'Nethermind mei internship lagvado'
-    );
+    txn = await domainContract.setData('Arjun', 'Breaking bad vibes');
     await txn.wait();
     console.log('Data setted');
 
-    const address = await domainContract.getAddress('nether');
+    const address = await domainContract.getAddress('Arjun');
     console.log('Owner is: ', address);
 
     const balance = await hre.ethers.provider.getBalance(
         domainContract.address
     );
-    console.log('Paisa hi paisa: ', hre.ethers.utils.formatEther(balance));
+    console.log('I am a billionaire: ', hre.ethers.utils.formatEther(balance));
 }
 
 main()
