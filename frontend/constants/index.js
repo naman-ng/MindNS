@@ -481,3 +481,4 @@ export const abi = [
         type: 'function',
     },
 ];
+export const tld = '.mind';
