@@ -3,7 +3,7 @@ import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
 import Web3Modal from 'web3modal';
 import { providers, Contract } from 'ethers';
-import { WHITELIST_CONTRACT_ADDRESS, abi, tld } from '../constants';
+import { WHITELIST_CONTRACT_ADDRESS, abi, tld } from './constants';
 
 // Constants
 const TWITTER_HANDLE = 'namn_grg';
@@ -13,6 +13,9 @@ const App = () => {
     const [loading, setLoading] = useState(false);
     const [walletConnected, setWalletConnected] = useState(false);
     const web3ModalRef = useRef();
+    const [domain, setDomain] = useState('');
+    const [record, setRecord] = useState('');
+    const [currentAccount, setCurrentAccount] = useState('');
 
     const getProviderOrSigner = async (needSigner = false) => {
         // Connect to Metamask
@@ -20,15 +23,21 @@ const App = () => {
         const provider = await web3ModalRef.current.connect();
         const web3Provider = new providers.Web3Provider(provider);
 
+        const signer = web3Provider.getSigner();
+        const address = await signer.getAddress();
+        console.log('Address is : ' + address);
+        setCurrentAccount(address);
+
         // If user is not connected to the Goerli network, let them know and throw an error
         const { chainId } = await web3Provider.getNetwork();
-        if (chainId !== 5) {
-            window.alert('Change the network to Goerli');
-            throw new Error('Change network to Goerli');
+        if (chainId !== 80001) {
+            window.alert('Change the network to Mumbai');
+            throw new Error('Change network to Mumbai');
         }
-
         if (needSigner) {
             const signer = web3Provider.getSigner();
+            const address = await signer.getAddress();
+            console.log(address);
             return signer;
         }
         return web3Provider;
@@ -49,13 +58,24 @@ const App = () => {
         // If wallet is not connected, return a button which allows them to connect their wllet
         if (walletConnected) {
             if (loading) {
-                return <button className="button">Loading...</button>;
+                return (
+                    <button className="cta-button connect-wallet-button">
+                        Loading...
+                    </button>
+                );
             } else {
-                return <button className="button">Wallet is Connected</button>;
+                return (
+                    <button className="cta-button connect-wallet-button">
+                        Wallet is Connected
+                    </button>
+                );
             }
         } else if (!walletConnected) {
             return (
-                <button onClick={connectWallet} className="button">
+                <button
+                    onClick={connectWallet}
+                    className="cta-button connect-wallet-button"
+                >
                     Connect your wallet
                 </button>
             );
@@ -68,13 +88,30 @@ const App = () => {
             // Assign the Web3Modal class to the reference object by setting it's `current` value
             // The `current` value is persisted throughout as long as this page is open
             web3ModalRef.current = new Web3Modal({
-                network: 'goerli',
+                network: 'mumbai',
                 providerOptions: {},
                 disableInjectedProvider: false,
             });
             connectWallet();
         }
     }, [walletConnected]);
+
+    const renderNotConnectedContainer = () => (
+        <div className="connect-wallet-container">
+            <img
+                src="https://media.giphy.com/media/3ohhwytHcusSCXXOUg/giphy.gif"
+                alt="Ninja donut gif"
+            />
+            {/* Call the connectWallet function we just wrote when the button is clicked */}
+            {renderButton()}
+            {/* <button
+                onClick={connectWallet}
+                className="cta-button connect-wallet-button"
+            >
+                Connect Wallet
+            </button> */}
+        </div>
+    );
 
     const renderInputForm = () => {
         return (
@@ -92,7 +129,7 @@ const App = () => {
                 <input
                     type="text"
                     value={record}
-                    placeholder="whats ur ninja power"
+                    placeholder="Do you have an ether mind?"
                     onChange={(e) => setRecord(e.target.value)}
                 />
 
@@ -126,11 +163,16 @@ const App = () => {
                             <p className="subtitle">
                                 Your immortal API on the blockchain!
                             </p>
-                            {renderButton()}
                         </div>
                     </header>
                 </div>
-
+                {/*
+                 */}
+                {!currentAccount && renderNotConnectedContainer()}
+                {/* Render the input form if an account is connected */}
+                {currentAccount && renderInputForm()}
+                {/*
+                 */}
                 <div className="footer-container">
                     <img
                         alt="Twitter Logo"
