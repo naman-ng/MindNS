@@ -125,6 +125,61 @@ const App = () => {
         </div>
     );
 
+    const renderMints = () => {
+        if (currentAccount && mints.length > 0) {
+            return (
+                <div className="mint-container">
+                    <p className="subtitle zz"> Recently minted domains!</p>
+                    <div className="mint-list">
+                        {mints.map((mint, index) => {
+                            return (
+                                <div className="mint-item" key={index}>
+                                    <div className="mint-row">
+                                        <a
+                                            className="link"
+                                            href={`https://testnets.opensea.io/assets/mumbai/${CONTRACT_ADDRESS}/${mint.id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <p className="underlined">
+                                                {' '}
+                                                {mint.name}
+                                                {tld}{' '}
+                                            </p>
+                                        </a>
+                                        {/* If mint.owner is currentAccount, add an "edit" button*/}
+                                        {mint.owner.toLowerCase() ===
+                                        currentAccount.toLowerCase() ? (
+                                            <button
+                                                className="edit-button"
+                                                onClick={() =>
+                                                    editRecord(mint.name)
+                                                }
+                                            >
+                                                <img
+                                                    className="edit-icon"
+                                                    src="https://img.icons8.com/metro/26/000000/pencil.png"
+                                                    alt="Edit button"
+                                                />
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                    <p> {mint.record} </p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+    };
+
+    const editRecord = (name) => {
+        console.log('Editing record for', name);
+        setEditing(true);
+        setDomain(name);
+    };
+
     const mintDomain = async () => {
         if (!domain) {
             return;
@@ -156,6 +211,10 @@ const App = () => {
                 'Data set! https://mumbai.polygonscan.com/tx/' + tx.hash
             );
 
+            setTimeout(() => {
+                fetchMints();
+            }, 3000);
+
             setRecord('');
             setDomain('');
             setLoading(false);
@@ -173,7 +232,7 @@ const App = () => {
 
             const mintRecords = await Promise.all(
                 names.map(async (name) => {
-                    const mintRecord = await contract.records(name);
+                    const mintRecord = await contract.getData(name);
                     const owner = await contract.domains(name);
                     return {
                         id: names.indexOf(name),
@@ -314,8 +373,8 @@ const App = () => {
                 {/*
                  */}
                 {!currentAccount && renderNotConnectedContainer()}
-                {/* Render the input form if an account is connected */}
                 {currentAccount && renderInputForm()}
+                {mints && renderMints()}
                 {/*
                  */}
                 <div className="footer-container">
