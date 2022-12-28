@@ -22,10 +22,10 @@ const App = () => {
     const [record, setRecord] = useState('');
     const [currentAccount, setCurrentAccount] = useState('');
     const [network, setNetwork] = useState('');
+    const [editing, setEditing] = useState(false);
+    const [mints, setMints] = useState([]);
 
     const getProviderOrSigner = async (needSigner = false) => {
-        // Connect to Metamask
-        // Since we store `web3Modal` as a reference, we need to access the `current` value to get access to the underlying object
         const provider = await web3ModalRef.current.connect();
         const web3Provider = new providers.Web3Provider(provider);
 
@@ -34,7 +34,6 @@ const App = () => {
         console.log('Address is : ' + address);
         setCurrentAccount(address);
 
-        // If user is not connected to the Goerli network, let them know and throw an error
         const { chainId } = await web3Provider.getNetwork();
         if (chainId !== 80001) {
             setNetwork('Ethereum');
@@ -54,8 +53,6 @@ const App = () => {
 
     const connectWallet = async () => {
         try {
-            // Get the provider from web3Modal, which in our case is MetaMask
-            // When used for the first time, it prompts the user to connect their wallet
             await getProviderOrSigner();
             setWalletConnected(true);
         } catch (err) {
@@ -92,6 +89,12 @@ const App = () => {
     };
 
     useEffect(() => {
+        if (network === 'Polygon Mumbai Testnet') {
+            fetchMints();
+        }
+    }, [currentAccount, network]);
+
+    useEffect(() => {
         // if wallet is not connected, create a new instance of Web3Modal and connect the MetaMask wallet
         if (!walletConnected) {
             // Assign the Web3Modal class to the reference object by setting it's `current` value
@@ -107,22 +110,23 @@ const App = () => {
 
     const renderNotConnectedContainer = () => (
         <div className="connect-wallet-container">
+            {/* <div className="img-gif-container"> */}
             <img
                 src="https://media.giphy.com/media/3oEduNyqHoMFP9oVXy/giphy.gif"
                 alt="Mind gif"
             />
+            {/* <img
+                    src="https://media.giphy.com/media/v0u7eU0nSmOJ0hGf6n/giphy.gif"
+                    alt="Eth gif"
+                /> */}
+            {/* </div> */}
             {/* Call the connectWallet function we just wrote when the button is clicked */}
             {renderButton()}
         </div>
     );
+
     const mintDomain = async () => {
-        // Don't run if the domain is empty
         if (!domain) {
-            return;
-        }
-        // Alert the user if the domain is too short
-        if (domain.length < 3) {
-            alert('Domain must be at least 3 characters long');
             return;
         }
         const price =
@@ -130,27 +134,22 @@ const App = () => {
         console.log('Minting domain', domain, 'with price', price);
 
         try {
-            // We need a Signer here since this is a 'write' transaction.
             const signer = await getProviderOrSigner(true);
-            // Create a new instance of the Contract with a Signer, which allows
-            // update methods
             const domainContract = new Contract(CONTRACT_ADDRESS, abi, signer);
 
             console.log('Going to mint...' + domain);
             console.log(domainContract.address);
 
-            const tx = await domainContract.register(domain, {
+            let tx = await domainContract.register(domain, {
                 value: ethers.utils.parseEther(price),
             });
             setLoading(true);
-            // wait for the transaction to get mined
             await tx.wait();
 
             console.log(
                 'Domain minted! https://mumbai.polygonscan.com/tx/' + tx.hash
             );
 
-            // Set the record for the domain
             tx = await domainContract.setData(domain, record);
             await tx.wait();
             console.log(
@@ -164,6 +163,59 @@ const App = () => {
             console.error(err);
         }
     };
+
+    const fetchMints = async () => {
+        try {
+            const signer = await getProviderOrSigner(true);
+            const contract = new Contract(CONTRACT_ADDRESS, abi, signer);
+
+            const names = await contract.getAllNames();
+
+            const mintRecords = await Promise.all(
+                names.map(async (name) => {
+                    const mintRecord = await contract.records(name);
+                    const owner = await contract.domains(name);
+                    return {
+                        id: names.indexOf(name),
+                        name: name,
+                        record: mintRecord,
+                        owner: owner,
+                    };
+                })
+            );
+
+            console.log('MINTS FETCHED ', mintRecords);
+            setMints(mintRecords);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const updateDomain = async () => {
+        if (!record || !domain) {
+            return;
+        }
+        setLoading(true);
+        console.log('Updating domain', domain, 'with record', record);
+        try {
+            const signer = await getProviderOrSigner(true);
+            const contract = new Contract(CONTRACT_ADDRESS, abi, signer);
+
+            let tx = await contract.setRecord(domain, record);
+            await tx.wait();
+            console.log(
+                'Record set https://mumbai.polygonscan.com/tx/' + tx.hash
+            );
+
+            fetchMints();
+            setRecord('');
+            setDomain('');
+        } catch (error) {
+            console.log(error);
+        }
+        setLoading(false);
+    };
+
     const renderInputForm = () => {
         return (
             <div className="form-container">
@@ -183,8 +235,37 @@ const App = () => {
                     placeholder="Do you have an ether mind?"
                     onChange={(e) => setRecord(e.target.value)}
                 />
-
-                <div className="button-container">
+                {editing ? (
+                    <div className="button-container">
+                        {/* This will call the updateDomain function we just made */}
+                        <button
+                            className="cta-button mint-button"
+                            disabled={loading}
+                            onClick={updateDomain}
+                        >
+                            Set record
+                        </button>
+                        {/* This will let us get out of editing mode by setting editing to false */}
+                        <button
+                            className="cta-button mint-button"
+                            onClick={() => {
+                                setEditing(false);
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                ) : (
+                    // If editing is not true, the mint button will be returned instead
+                    <button
+                        className="cta-button mint-button"
+                        disabled={loading}
+                        onClick={mintDomain}
+                    >
+                        Mint
+                    </button>
+                )}
+                {/* <div className="button-container">
                     <button
                         className="cta-button mint-button"
                         disabled={null}
@@ -192,7 +273,7 @@ const App = () => {
                     >
                         Mint
                     </button>
-                </div>
+                </div> */}
             </div>
         );
     };
