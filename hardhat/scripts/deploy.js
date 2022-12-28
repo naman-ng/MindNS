@@ -9,18 +9,18 @@ async function main() {
 
     console.log('Deployed to: ', domainContract.address);
 
-    let txn = await domainContract.register('Arjun', {
+    let txn = await domainContract.register('Final', {
         value: hre.ethers.utils.parseEther('0.1'),
     });
 
     await txn.wait();
-    console.log('Minted domain Arjun.mind');
+    console.log('Minted domain Final.mind');
 
-    txn = await domainContract.setData('Arjun', 'Breaking bad vibes');
+    txn = await domainContract.setData('Final', 'Breaking bad vibes');
     await txn.wait();
     console.log('Data setted');
 
-    const address = await domainContract.getAddress('Arjun');
+    const address = await domainContract.getAddress('Final');
     console.log('Owner is: ', address);
 
     const balance = await hre.ethers.provider.getBalance(

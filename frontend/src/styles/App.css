@@ -1,6 +1,6 @@
 .App {
     height: 100vh;
-    background-color: #0d1116;
+    background-color: #141b1f;
     text-align: center;
     color: white;
 }
@@ -9,9 +9,11 @@ p {
     margin: 0;
 }
 
+
+
 .container {
     height: 100%;
-    background-color: #181818;
+    background-color: #f1f1f1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -53,7 +55,7 @@ header {
 
 .right {
     display: flex;
-    background: black;
+    background: linear-gradient();
     border-radius: 16px;
     padding: 12px 20px;
     height: 99%;
@@ -63,6 +65,13 @@ header {
 
 .content-container {
     background-color: #a200d6;
+}
+
+.connect-wallet-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    max-width: 550px;
 }
 
 .cta-button {
@@ -78,34 +87,33 @@ header {
     color: white;
 }
 
-.connect-wallet-container {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    max-width: 550px;
-}
-
 .connect-wallet-container img {
     padding-bottom: 20px;
 }
 
 .connect-wallet-button {
     background-image: linear-gradient(to right,
-            #ff8177 0%,
-            #ff867a 0%,
-            #ff8c7f 21%,
-            #f99185 52%,
-            #cf556c 78%,
-            #b12a5b 100%);
+            #ef77ff 0%,
+            #af1d6e 0%,
+            #fb7fff 21%,
+            #f985d6 52%,
+            #9522f2 78%,
+            #962ab1 100%);
     background-size: 200% 200%;
     animation: gradient-animation 4s ease infinite;
 }
 
 .mint-button {
-    background: -webkit-linear-gradient(left, #a200d6, #ff6fdf);
-    font-size: 18px;
+    background-image: linear-gradient(to right,
+            #ef77ff 0%,
+            #af1d6e 0%,
+            #fb7fff 21%,
+            #f985d6 52%,
+            #9522f2 78%,
+            #962ab1 100%);
     background-size: 200% 200%;
     animation: gradient-animation 4s ease infinite;
+    font-size: 18px;
     margin: 20px 10px;
     border-radius: 20px;
     padding: 0px 2rem;
@@ -139,10 +147,14 @@ header {
 
 
 .footer-container {
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 20px 20px 40px -6px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(7.9px);
+    -webkit-backdrop-filter: blur(7.9px);
+    border-radius: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-bottom: 30px;
 }
 
 .twitter-logo {
@@ -151,7 +163,8 @@ header {
 }
 
 .footer-text {
-    color: white;
+
+    color: black;
     font-size: 16px;
     font-weight: bold;
 }
@@ -167,7 +180,13 @@ header {
 input {
     border: 0;
     border-radius: 12px;
-    background-color: black;
+    /* background-color: black; */
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 20px 20px 40px -6px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(7.9px);
+    -webkit-backdrop-filter: blur(7.9px);
+    border-radius: 10px;
+
     color: white;
     letter-spacing: 1px;
     font-size: 26px;
@@ -178,7 +197,7 @@ input {
 }
 
 input::placeholder {
-    color: gray;
+    color: white;
     letter-spacing: 2px;
 }
 
@@ -300,4 +319,14 @@ input:focus {
     100% {
         background-position: 0% 50%;
     }
+}
+
+.zz {
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 20px 20px 40px -6px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(7.9px);
+    -webkit-backdrop-filter: blur(7.9px);
+    border-radius: 10px;
+
+    padding: 10px;
 }

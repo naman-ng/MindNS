@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = '0xa3a397efb860a508af2134fda888843d27d5066e';
+export const CONTRACT_ADDRESS = '0x1e95329b00F895b885fD984AF045E9e130ff7B86';
 export const abi = [
     {
         inputs: [
@@ -10,6 +10,27 @@ export const abi = [
         ],
         stateMutability: 'payable',
         type: 'constructor',
+    },
+    {
+        inputs: [],
+        name: 'AlreadyRegistered',
+        type: 'error',
+    },
+    {
+        inputs: [
+            {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+            },
+        ],
+        name: 'InvalidName',
+        type: 'error',
+    },
+    {
+        inputs: [],
+        name: 'Unauthorized',
+        type: 'error',
     },
     {
         anonymous: false,
@@ -194,6 +215,19 @@ export const abi = [
         type: 'function',
     },
     {
+        inputs: [],
+        name: 'getAllNames',
+        outputs: [
+            {
+                internalType: 'string[]',
+                name: '',
+                type: 'string[]',
+            },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
         inputs: [
             {
                 internalType: 'uint256',
@@ -257,12 +291,57 @@ export const abi = [
     },
     {
         inputs: [],
+        name: 'isOwner',
+        outputs: [
+            {
+                internalType: 'bool',
+                name: '',
+                type: 'bool',
+            },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        inputs: [],
         name: 'name',
         outputs: [
             {
                 internalType: 'string',
                 name: '',
                 type: 'string',
+            },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        inputs: [
+            {
+                internalType: 'uint256',
+                name: '',
+                type: 'uint256',
+            },
+        ],
+        name: 'names',
+        outputs: [
+            {
+                internalType: 'string',
+                name: '',
+                type: 'string',
+            },
+        ],
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        inputs: [],
+        name: 'owner',
+        outputs: [
+            {
+                internalType: 'address payable',
+                name: '',
+                type: 'address',
             },
         ],
         stateMutability: 'view',
@@ -480,5 +559,34 @@ export const abi = [
         stateMutability: 'nonpayable',
         type: 'function',
     },
+    {
+        inputs: [
+            {
+                internalType: 'uint256',
+                name: 'len',
+                type: 'uint256',
+            },
+        ],
+        name: 'valid',
+        outputs: [
+            {
+                internalType: 'bool',
+                name: '',
+                type: 'bool',
+            },
+        ],
+        stateMutability: 'pure',
+        type: 'function',
+    },
+    {
+        inputs: [],
+        name: 'withdraw',
+        outputs: [],
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
 ];
 export const tld = '.mind';
+
+export const TWITTER_HANDLE = 'namn_grg';
+export const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;

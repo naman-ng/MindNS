@@ -3,11 +3,16 @@ import './styles/App.css';
 import twitterLogo from './assets/twitter-logo.svg';
 import Web3Modal from 'web3modal';
 import { providers, Contract, ethers } from 'ethers';
-import { CONTRACT_ADDRESS, abi, tld } from './constants';
-
-// Constants
-const TWITTER_HANDLE = 'namn_grg';
-const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
+import {
+    CONTRACT_ADDRESS,
+    abi,
+    tld,
+    TWITTER_HANDLE,
+    TWITTER_LINK,
+} from './constants';
+import polygonLogo from './assets/polygonlogo.png';
+import ethLogo from './assets/ethlogo.png';
+import { networks } from './utils/networks';
 
 const App = () => {
     const [loading, setLoading] = useState(false);
@@ -16,6 +21,7 @@ const App = () => {
     const [domain, setDomain] = useState('');
     const [record, setRecord] = useState('');
     const [currentAccount, setCurrentAccount] = useState('');
+    const [network, setNetwork] = useState('');
 
     const getProviderOrSigner = async (needSigner = false) => {
         // Connect to Metamask
@@ -31,8 +37,11 @@ const App = () => {
         // If user is not connected to the Goerli network, let them know and throw an error
         const { chainId } = await web3Provider.getNetwork();
         if (chainId !== 80001) {
+            setNetwork('Ethereum');
             window.alert('Change the network to Mumbai');
             throw new Error('Change network to Mumbai');
+        } else {
+            setNetwork('Polygon Mumbai Testnet');
         }
         if (needSigner) {
             const signer = web3Provider.getSigner();
@@ -99,17 +108,11 @@ const App = () => {
     const renderNotConnectedContainer = () => (
         <div className="connect-wallet-container">
             <img
-                src="https://media.giphy.com/media/3ohhwytHcusSCXXOUg/giphy.gif"
-                alt="Ninja donut gif"
+                src="https://media.giphy.com/media/3oEduNyqHoMFP9oVXy/giphy.gif"
+                alt="Mind gif"
             />
             {/* Call the connectWallet function we just wrote when the button is clicked */}
             {renderButton()}
-            {/* <button
-                onClick={connectWallet}
-                className="cta-button connect-wallet-button"
-            >
-                Connect Wallet
-            </button> */}
         </div>
     );
     const mintDomain = async () => {
@@ -199,11 +202,31 @@ const App = () => {
             <div className="container">
                 <div className="header-container">
                     <header>
-                        <div className="left">
+                        <div className="left zz">
                             <p className="title">🧠 Mind Name Service</p>
                             <p className="subtitle">
-                                Your immortal API on the blockchain!
+                                Your another identity on the blockchain!
                             </p>
+                        </div>
+                        <div className="right zz">
+                            <img
+                                alt="Network logo"
+                                className="logo"
+                                src={
+                                    network.includes('Polygon')
+                                        ? polygonLogo
+                                        : ethLogo
+                                }
+                            />
+                            {currentAccount ? (
+                                <p>
+                                    {' '}
+                                    Wallet: {currentAccount.slice(0, 6)}...
+                                    {currentAccount.slice(-4)}{' '}
+                                </p>
+                            ) : (
+                                <p> Not connected </p>
+                            )}
                         </div>
                     </header>
                 </div>
